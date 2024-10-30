@@ -44,10 +44,20 @@ export class MemberService {
 		response.accessToken = await this.authService.createToken(response);
 		return response;
 	}
+
 	public async updateMember(): Promise<string> {
 		return 'updateMember executed';
 	}
+
 	public async getMember(): Promise<string> {
 		return 'getMember executed';
+	}
+
+	public async getAllMemberByAdmin(): Promise<string> {
+		return 'getAllMemberByAdmin executed';
+	}
+
+	public async updateMemberByAdmin(): Promise<string> {
+		return 'updateMemberByAdmin executed';
 	}
 }
