@@ -41,7 +41,13 @@ export class PropertyInput {
 	@IsInt()
 	@Min(1)
 	@Field(() => Int)
-	propertyRooms: number;
+	propertyBath: number;
+
+	@IsNotEmpty()
+	@IsInt()
+	@Min(1)
+	@Field(() => Int)
+	propertyGuests: number;
 
 	@IsNotEmpty()
 	@Field(() => [String])

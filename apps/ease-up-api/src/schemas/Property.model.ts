@@ -46,7 +46,12 @@ const PropertySchema = new Schema(
 			required: true,
 		},
 
-		propertyRooms: {
+		propertyBath: {
+			type: Number,
+			required: true,
+		},
+
+		propertyGuests: {
 			type: Number,
 			required: true,
 		},
