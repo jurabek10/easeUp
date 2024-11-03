@@ -4,6 +4,16 @@ export const availableAgentSorts = ['createdAt', 'updatedAt', 'memberLikes', 'me
 
 export const availableMemberSorts = ['createdAt', 'updatedAt', 'memberLikes', 'memberViews'];
 
+export const availabeOptions = ['propertyFamily', 'propertySeasonal'];
+export const availablePropertySorts = [
+	'createdAt',
+	'updatedAt',
+	'propertyLikes',
+	'propertyViews',
+	'propertyRank',
+	'propertyPrice',
+];
+
 /** IMAGE CONFIGURATION  */
 import { v4 as uuidv4 } from 'uuid';
 import * as path from 'path';
@@ -15,4 +25,13 @@ export const getSerialForImage = (filename: string) => {
 
 export const shapeIntoMogoObjectId = (target: any) => {
 	return typeof target === 'string' ? new ObjectId(target) : target;
+};
+
+export const lookupMember = {
+	$lookup: {
+		from: 'members',
+		localField: 'memberId',
+		foreignField: '_id',
+		as: 'memberData',
+	},
 };
