@@ -9,6 +9,8 @@ import { ViewService } from '../view/view.service';
 import { StatisticModifier, T } from '../../libs/types/common';
 import { PropertyStatus } from '../../libs/enums/property.enum';
 import { ViewGroup } from '../../libs/enums/view.enum';
+import { PropertyUpdate } from '../../libs/dto/property/property.update';
+import moment from 'moment';
 
 @Injectable()
 export class PropertyService {
@@ -55,5 +57,31 @@ export class PropertyService {
 		console.log('memberStatsEditor executed');
 		const { _id, targetKey, modifier } = input;
 		return await this.propertyModel.findByIdAndUpdate(_id, { $inc: { [targetKey]: modifier } }, { new: true }).exec();
+	}
+
+	public async updateProperty(memberId: ObjectId, input: PropertyUpdate): Promise<Property> {
+		let { propertyStatus, reservedAt, deletedAt } = input;
+		const search: T = {
+			_id: input._id,
+			memberId: memberId,
+			propertyStatus: PropertyStatus.ACTIVE,
+		};
+
+		if (propertyStatus === PropertyStatus.RESERVED) reservedAt = new Date();
+		else if (propertyStatus === PropertyStatus.DELETE) deletedAt = new Date();
+
+		const result = await this.propertyModel.findByIdAndUpdate(search, input, { new: true }).exec();
+
+		if (!result) throw new InternalServerErrorException(Message.UPDATE_FAILED);
+
+		if (reservedAt || deletedAt) {
+			await this.memberService.memberStatsEditor({
+				_id: memberId,
+				targetKey: 'memberProperties',
+				modifier: -1,
+			});
+		}
+
+		return result;
 	}
 }

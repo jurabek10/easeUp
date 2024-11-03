@@ -10,6 +10,7 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { PropertyInput } from '../../libs/dto/property/property.input';
 import { WithoutGuard } from '../auth/guards/without.guard';
 import { shapeIntoMogoObjectId } from '../../libs/config';
+import { PropertyUpdate } from '../../libs/dto/property/property.update';
 
 @Resolver()
 export class PropertyResolver {
@@ -36,5 +37,17 @@ export class PropertyResolver {
 		console.log('Query: getProperty');
 		const propertyId = shapeIntoMogoObjectId(input);
 		return await this.propertyService.getProperty(memberId, propertyId);
+	}
+
+	@Roles(MemberType.AGENT)
+	@UseGuards(RolesGuard)
+	@Mutation((returns) => Property)
+	public async updateProperty(
+		@Args('input') input: PropertyUpdate,
+		@AuthMember('_id') memberId: ObjectId,
+	): Promise<Property> {
+		console.log('Mutation: updateProperty');
+		input._id = shapeIntoMogoObjectId(input._id);
+		return await this.propertyService.updateProperty(memberId, input);
 	}
 }
