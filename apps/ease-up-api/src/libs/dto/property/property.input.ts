@@ -95,10 +95,10 @@ export class GuestsRange {
 
 @InputType()
 export class PeriodsRange {
-	@Field(() => Int)
+	@Field(() => Date)
 	start: Date;
 
-	@Field(() => Int)
+	@Field(() => Date)
 	end: Date;
 }
 
@@ -110,19 +110,15 @@ class PISearch {
 
 	@IsOptional()
 	@Field(() => [PropertyLocation], { nullable: true })
-	locationList?: PropertyLocation;
+	locationList?: PropertyLocation[];
 
 	@IsOptional()
 	@Field(() => [PropertyType], { nullable: true })
-	typeList?: PropertyType;
+	typeList?: PropertyType[];
 
 	@IsOptional()
 	@Field(() => [Int], { nullable: true })
 	bathList?: Number[];
-
-	@IsOptional()
-	@Field(() => [Int], { nullable: true })
-	guestsList?: Number[];
 
 	@IsOptional()
 	@Field(() => [Int], { nullable: true })
@@ -169,7 +165,7 @@ export class PropertiesInquiry {
 
 	@IsOptional()
 	@Field(() => Direction, { nullable: true })
-	direction: Direction;
+	direction?: Direction;
 
 	@IsNotEmpty()
 	@Field(() => PISearch)

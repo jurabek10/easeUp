@@ -114,6 +114,7 @@ export class PropertyService {
 
 		return result[0];
 	}
+
 	private shapeMatchQuery(match: T, input: PropertiesInquiry): void {
 		const {
 			memberId,
@@ -128,12 +129,15 @@ export class PropertyService {
 			text,
 		} = input.search;
 		if (memberId) match.memberId = shapeIntoMogoObjectId(memberId);
-		if (typeList) match.propertyType = { $in: typeList };
-		if (bathList) match.propertyRooms = { $in: bathList };
-		if (bedsList) match.propertyBeds = { $in: bedsList };
+		if (locationList && locationList.length) match.propertyLocation = { $in: locationList };
+		if (typeList && typeList.length) match.propertyType = { $in: typeList };
+		if (bathList && bathList.length) match.propertyBath = { $in: bathList };
+		if (bedsList && bedsList.length) match.propertyBeds = { $in: bedsList };
+
 		if (pricesRange) match.propertyPrice = { $gte: pricesRange.start, $lte: pricesRange.end };
 		if (periodsRange) match.createdAt = { $gte: periodsRange.start, $lte: periodsRange.end };
-		if (guestsRange) match.propertySquare = { $gte: guestsRange.start, $lte: guestsRange.end };
+		if (guestsRange) match.propertyGuests = { $gte: guestsRange.start, $lte: guestsRange.end };
+
 		if (text)
 			match.propertyTitle = {
 				$regex: new RegExp(text, 'i'),
