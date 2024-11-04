@@ -5,6 +5,7 @@ export const availableAgentSorts = ['createdAt', 'updatedAt', 'memberLikes', 'me
 export const availableMemberSorts = ['createdAt', 'updatedAt', 'memberLikes', 'memberViews'];
 
 export const availabeOptions = ['propertyFamily', 'propertySeasonal'];
+
 export const availablePropertySorts = [
 	'createdAt',
 	'updatedAt',
@@ -13,6 +14,8 @@ export const availablePropertySorts = [
 	'propertyRank',
 	'propertyPrice',
 ];
+
+export const availableBoardArticlesSorts = ['createdAt', 'updatedAt', 'articleLikes', 'articleViews'];
 
 /** IMAGE CONFIGURATION  */
 import { v4 as uuidv4 } from 'uuid';
