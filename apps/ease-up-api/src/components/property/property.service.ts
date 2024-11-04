@@ -15,7 +15,7 @@ import { StatisticModifier, T } from '../../libs/types/common';
 import { PropertyStatus } from '../../libs/enums/property.enum';
 import { ViewGroup } from '../../libs/enums/view.enum';
 import { PropertyUpdate } from '../../libs/dto/property/property.update';
-import moment from 'moment';
+import * as moment from 'moment';
 import { lookupMember, shapeIntoMogoObjectId } from '../../libs/config';
 
 @Injectable()
@@ -73,8 +73,8 @@ export class PropertyService {
 			propertyStatus: PropertyStatus.ACTIVE,
 		};
 
-		if (propertyStatus === PropertyStatus.RESERVED) reservedAt = new Date();
-		else if (propertyStatus === PropertyStatus.DELETE) deletedAt = new Date();
+		if (propertyStatus === PropertyStatus.RESERVED) reservedAt = moment().toDate();
+		else if (propertyStatus === PropertyStatus.DELETE) deletedAt = moment().toDate();
 
 		const result = await this.propertyModel.findByIdAndUpdate(search, input, { new: true }).exec();
 
