@@ -30,6 +30,7 @@ export class BoardArticleResolver {
 		console.log('Mutation: createBoardArticle');
 		return await this.boardArticleService.createBoardArticle(memberId, input);
 	}
+
 	@UseGuards(WithoutGuard)
 	@Query((returns) => BoardArticle)
 	public async getBoardArticle(
@@ -49,7 +50,7 @@ export class BoardArticleResolver {
 	): Promise<BoardArticle> {
 		console.log('Mutation: updateProperty');
 		input._id = shapeIntoMogoObjectId(input._id);
-		return await this.boardArticleService.updateProperty(memberId, input);
+		return await this.boardArticleService.updateBoardArticle(memberId, input);
 	}
 	@UseGuards(WithoutGuard)
 	@Query((returns) => BoardArticles)
