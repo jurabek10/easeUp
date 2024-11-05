@@ -8,7 +8,7 @@ import { MemberModule } from '../member/member.module';
 
 @Module({
 	imports: [MongooseModule.forFeature([{ name: 'Like', schema: LikeSchema }])],
-	providers: [LikeResolver, LikeService],
+	providers: [LikeService],
 	exports: [LikeService],
 })
 export class LikeModule {}
