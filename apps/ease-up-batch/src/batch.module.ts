@@ -1,11 +1,13 @@
 import { Module } from '@nestjs/common';
-import { EaseUpBatchController } from './batch.controller';
-import { EaseUpBatchService } from './batch.service';
+import { BatchController } from './batch.controller';
+import { BatchService } from './batch.service';
 import { ConfigModule } from '@nestjs/config';
+import { DatabaseModule } from './database/database.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
-	imports: [ConfigModule.forRoot()],
-	controllers: [EaseUpBatchController],
-	providers: [EaseUpBatchService],
+	imports: [ConfigModule.forRoot(), DatabaseModule, ScheduleModule.forRoot()],
+	controllers: [BatchController],
+	providers: [BatchService],
 })
-export class EaseUpBatchModule {}
+export class BatchModule {}

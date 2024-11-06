@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
-export class EaseUpBatchService {
+export class BatchService {
 	getHello(): string {
-		return 'Welcome to EaseUp BATCH Server';
+		return 'Welcome to Nestar BATCH Server!';
 	}
 }
