@@ -1,5 +1,5 @@
 import { NestFactory } from '@nestjs/core';
-import { EaseUpBatchModule } from './ease-up-batch.module';
+import { EaseUpBatchModule } from './batch.module';
 
 async function bootstrap() {
 	const app = await NestFactory.create(EaseUpBatchModule);
