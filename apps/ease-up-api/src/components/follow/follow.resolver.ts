@@ -1,11 +1,13 @@
-import { Args, Mutation, Resolver } from '@nestjs/graphql';
+import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { FollowService } from './follow.service';
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { UseGuards } from '@nestjs/common';
-import { Follower } from '../../libs/dto/follow/follow';
+import { Follower, Followers, Followings } from '../../libs/dto/follow/follow';
 import { AuthMember } from '../auth/decorators/authMember.decorator';
 import { ObjectId } from 'mongoose';
 import { shapeIntoMogoObjectId } from '../../libs/config';
+import { WithoutGuard } from '../auth/guards/without.guard';
+import { FollowInquiry } from '../../libs/dto/follow/follow.input';
 
 @Resolver()
 export class FollowResolver {
@@ -25,5 +27,29 @@ export class FollowResolver {
 		console.log('Mutation:  unsubscribe');
 		const followingId = shapeIntoMogoObjectId(input);
 		return await this.followService.unsubscribe(memberId, followingId);
+	}
+
+	@UseGuards(WithoutGuard)
+	@Query((returns) => Followings)
+	public async getMemberFollowings(
+		@Args('input') input: FollowInquiry,
+		@AuthMember('_id') memberId: ObjectId,
+	): Promise<Followings> {
+		console.log('Query: getMemberFollowings');
+		const { followerId } = input.search;
+		input.search.followerId = shapeIntoMogoObjectId(followerId);
+		return await this.followService.getMemberFollowings(memberId, input);
+	}
+
+	@UseGuards(WithoutGuard)
+	@Query((returns) => Followers)
+	public async getMemberFollowers(
+		@Args('input') input: FollowInquiry,
+		@AuthMember('_id') memberId: ObjectId,
+	): Promise<Followers> {
+		console.log('Query: getMemberFollowers');
+		const { followingId } = input.search;
+		input.search.followingId = shapeIntoMogoObjectId(followingId);
+		return await this.followService.getMemberFollowers(memberId, input);
 	}
 }
