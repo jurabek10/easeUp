@@ -31,6 +31,7 @@ export class Follower {
 
 	@Field(() => Date)
 	updatedAt: Date;
+
 	/** from aggregation **/
 
 	@Field(() => [MeLiked], { nullable: true })
@@ -59,6 +60,7 @@ export class Following {
 
 	@Field(() => Date)
 	updatedAt: Date;
+
 	/** from aggregation **/
 
 	@Field(() => [MeLiked], { nullable: true })
