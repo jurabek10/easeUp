@@ -27,8 +27,8 @@ export class Property {
 	@Field(() => Number)
 	propertyPrice: number;
 
-	@Field(() => Number)
-	propertySquare: number;
+	// @Field(() => Number)
+	// propertySquare: number;
 
 	@Field(() => Int)
 	propertyBeds: number;
