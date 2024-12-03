@@ -5,12 +5,13 @@ import { MemberType } from '../../libs/enums/member.enum';
 import { UseGuards } from '@nestjs/common';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Notice, Notices } from '../../libs/dto/notice/notice';
-import { NoticeInput, NoticesInquiry } from '../../libs/dto/notice/notice.input';
+import { AllNoticesInquiry, NoticeInput, NoticesInquiry } from '../../libs/dto/notice/notice.input';
 import { AuthMember } from '../auth/decorators/authMember.decorator';
 import { ObjectId } from 'mongoose';
 import { NoticeUpdate } from '../../libs/dto/notice/notice.update';
 import { shapeIntoMogoObjectId } from '../../libs/config';
 import { WithoutGuard } from '../auth/guards/without.guard';
+import { AllBoardArticlesInquiry } from '../../libs/dto/board-article/board-article.input';
 
 @Resolver()
 export class NoticeResolver {
@@ -33,6 +34,17 @@ export class NoticeResolver {
 	): Promise<Notices> {
 		console.log('Query: getNotices');
 		return await this.noticeService.getNotices(memberId, input);
+	}
+
+	@Roles(MemberType.ADMIN)
+	@UseGuards(RolesGuard)
+	@Query((returns) => Notices)
+	public async getAllNoticesByAdmin(
+		@Args('input') input: AllNoticesInquiry,
+		@AuthMember('_id') memberId: ObjectId,
+	): Promise<Notices> {
+		console.log('Query: getAllNoticesByAdminn');
+		return await this.noticeService.getAllNoticesByAdmin(input);
 	}
 
 	@Roles(MemberType.ADMIN)

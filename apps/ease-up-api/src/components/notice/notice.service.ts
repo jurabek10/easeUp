@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, ObjectId } from 'mongoose';
-import { NoticeInput, NoticesInquiry } from '../../libs/dto/notice/notice.input';
+import { AllNoticesInquiry, NoticeInput, NoticesInquiry } from '../../libs/dto/notice/notice.input';
 import { Notice, Notices } from '../../libs/dto/notice/notice';
 import { Direction, Message } from '../../libs/enums/common.enum';
 import { NoticeUpdate } from '../../libs/dto/notice/notice.update';
@@ -29,6 +29,33 @@ export class NoticeService {
 		const sort: T = { [input?.sort ?? 'createdAt']: input?.direction ?? Direction.DESC };
 
 		console.log('match:', match);
+		const result = await this.noticeModel
+			.aggregate([
+				{ $match: match },
+				{ $sort: sort },
+				{
+					$facet: {
+						list: [
+							{ $skip: (input.page - 1) * input.limit },
+							{ $limit: input.limit },
+							lookupMember,
+							{ $unwind: '$memberData' },
+						],
+						metaCounter: [{ $count: 'total' }],
+					},
+				},
+			])
+			.exec();
+		if (!result.length) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
+		return result[0];
+	}
+
+	public async getAllNoticesByAdmin(input: AllNoticesInquiry): Promise<Notices> {
+		const { noticeStatus, noticeCategory } = input.search;
+		const match: T = {};
+		const sort: T = { [input?.sort ?? 'createdAt']: input?.direction ?? Direction.DESC };
+		if (noticeStatus) match.noticeStatus = noticeStatus;
+		if (noticeCategory) match.noticeCategory = noticeCategory;
 		const result = await this.noticeModel
 			.aggregate([
 				{ $match: match },
