@@ -20,6 +20,12 @@ export class Notice {
 	@Field(() => String)
 	memberId: ObjectId;
 
+	@Field(() => Date, { nullable: true })
+	blockedAt?: Date;
+
+	@Field(() => Date, { nullable: true })
+	deletedAt?: Date;
+
 	@Field(() => Date)
 	createdAt: Date;
 

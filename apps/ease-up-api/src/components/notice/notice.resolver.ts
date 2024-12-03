@@ -8,6 +8,8 @@ import { Notice } from '../../libs/dto/notice/notice';
 import { NoticeInput } from '../../libs/dto/notice/notice.input';
 import { AuthMember } from '../auth/decorators/authMember.decorator';
 import { ObjectId } from 'mongoose';
+import { NoticeUpdate } from '../../libs/dto/notice/notice.update';
+import { shapeIntoMogoObjectId } from '../../libs/config';
 
 @Resolver()
 export class NoticeResolver {
@@ -20,5 +22,17 @@ export class NoticeResolver {
 		console.log('Mutation: createNotice');
 		input.memberId = memberId;
 		return await this.noticeService.createNotice(input);
+	}
+
+	@Roles(MemberType.ADMIN)
+	@UseGuards(RolesGuard)
+	@Mutation((returns) => Notice)
+	public async updateNotice(
+		@Args('input') input: NoticeUpdate,
+		@AuthMember('_id') memberId: ObjectId,
+	): Promise<Notice> {
+		console.log('Mutation: updateNotice');
+		input._id = shapeIntoMogoObjectId(input._id);
+		return await this.noticeService.updateNotice(memberId, input);
 	}
 }

@@ -10,7 +10,7 @@ registerEnumType(NoticeCategory, {
 });
 
 export enum NoticeStatus {
-	HOLD = 'HOLD',
+	BLOCKED = 'BLOCKED',
 	ACTIVE = 'ACTIVE',
 	DELETE = 'DELETE',
 }

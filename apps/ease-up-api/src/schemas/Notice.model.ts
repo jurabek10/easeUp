@@ -20,6 +20,14 @@ const NoticeSchema = new Schema(
 			required: true,
 		},
 
+		blockedAt: {
+			type: Date,
+		},
+
+		deletedAt: {
+			type: Date,
+		},
+
 		memberId: {
 			type: Schema.Types.ObjectId,
 			required: true,
