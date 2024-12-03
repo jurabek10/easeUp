@@ -1,7 +1,7 @@
 import { registerEnumType } from '@nestjs/graphql';
 
 export enum NoticeCategory {
-	FAQ = 'FAQ',
+	EVENT = 'EVENT',
 	TERMS = 'TERMS',
 	INQUIRY = 'INQUIRY',
 }
