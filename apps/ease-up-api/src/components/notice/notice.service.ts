@@ -66,4 +66,11 @@ export class NoticeService {
 
 		return result;
 	}
+
+	public async removeNotice(noticeId: ObjectId): Promise<Notice> {
+		const search: T = { _id: noticeId, noticeStatus: NoticeStatus.DELETE };
+		const result = await this.noticeModel.findByIdAndDelete(search).exec();
+		if (!result) throw new InternalServerErrorException(Message.REMOVE_FAILED);
+		return result;
+	}
 }
