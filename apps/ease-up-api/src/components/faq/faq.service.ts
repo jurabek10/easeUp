@@ -7,6 +7,8 @@ import { Direction, Message } from '../../libs/enums/common.enum';
 import { T } from '../../libs/types/common';
 import { FaqStatus } from '../../libs/enums/faq.enum';
 import { lookupMember } from '../../libs/config';
+import { FaqUpdate } from '../../libs/dto/faq/faq.update';
+import * as moment from 'moment';
 
 @Injectable()
 export class FaqService {
@@ -47,5 +49,30 @@ export class FaqService {
 			.exec();
 		if (!result.length) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
 		return result[0];
+	}
+
+	public async updateFaq(input: FaqUpdate): Promise<Faq> {
+		let { faqStatus, blockedAt, deletedAt } = input;
+		const search: T = {
+			_id: input._id,
+			faqStatus: FaqStatus.ACTIVE,
+		};
+
+		if (faqStatus === FaqStatus.BLOCKED) blockedAt = moment().toDate();
+		else if (faqStatus === FaqStatus.DELETE) deletedAt = moment().toDate();
+
+		const result = await this.faqModel.findByIdAndUpdate(search, input, { new: true }).exec();
+
+		if (!result) throw new InternalServerErrorException(Message.UPDATE_FAILED);
+
+		return result;
+	}
+
+	public async removeFaq(faqId: ObjectId): Promise<Faq> {
+		const search: T = { _id: faqId, faqStatus: FaqStatus.DELETE };
+		console.log('search', search);
+		const result = await this.faqModel.findByIdAndDelete(search).exec();
+		if (!result) throw new InternalServerErrorException(Message.REMOVE_FAILED);
+		return result;
 	}
 }
