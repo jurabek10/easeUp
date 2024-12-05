@@ -55,6 +55,10 @@ class AFISearch {
 	@IsOptional()
 	@Field(() => FaqCategory, { nullable: true })
 	faqCategory?: FaqCategory;
+
+	@IsOptional()
+	@Field(() => String, { nullable: true })
+	text?: string;
 }
 
 @InputType()

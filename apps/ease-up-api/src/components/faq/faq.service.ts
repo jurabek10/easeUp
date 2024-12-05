@@ -25,11 +25,12 @@ export class FaqService {
 	}
 
 	public async getAllFaqs(input: AllFaqsInquiry): Promise<Faqs> {
-		const { faqStatus, faqCategory } = input.search;
+		const { faqStatus, faqCategory, text } = input.search;
 		const match: T = {};
 		const sort: T = { [input?.sort ?? 'createdAt']: input?.direction ?? Direction.DESC };
 		if (faqStatus) match.faqStatus = faqStatus;
 		if (faqCategory) match.faqCategory = faqCategory;
+		if (text) match.faqTitle = { $regex: new RegExp(text, 'i') };
 		const result = await this.faqModel
 			.aggregate([
 				{ $match: match },
