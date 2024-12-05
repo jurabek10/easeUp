@@ -51,11 +51,12 @@ export class NoticeService {
 	}
 
 	public async getAllNoticesByAdmin(input: AllNoticesInquiry): Promise<Notices> {
-		const { noticeStatus, noticeCategory } = input.search;
+		const { noticeStatus, noticeCategory, text } = input.search;
 		const match: T = {};
 		const sort: T = { [input?.sort ?? 'createdAt']: input?.direction ?? Direction.DESC };
 		if (noticeStatus) match.noticeStatus = noticeStatus;
 		if (noticeCategory) match.noticeCategory = noticeCategory;
+		if (text) match.noticeTitle = { $regex: new RegExp(text, 'i') };
 		const result = await this.noticeModel
 			.aggregate([
 				{ $match: match },

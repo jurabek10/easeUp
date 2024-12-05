@@ -49,6 +49,10 @@ class ANISearch {
 	@IsOptional()
 	@Field(() => NoticeCategory, { nullable: true })
 	noticeCategory?: NoticeCategory;
+
+	@IsOptional()
+	@Field(() => String, { nullable: true })
+	text?: string;
 }
 
 @InputType()
