@@ -2,9 +2,11 @@ import { BadRequestException, Injectable, InternalServerErrorException } from '@
 import { Model, ObjectId, Schema } from 'mongoose';
 import { NotificationUpdate } from '../../libs/dto/notification/notification.update';
 import { InjectModel } from '@nestjs/mongoose';
-import { NotificationInput } from '../../libs/dto/notification/notification.input';
-import { Message } from '../../libs/enums/common.enum';
+import { NotificationInput, NotificationsInquiry } from '../../libs/dto/notification/notification.input';
+import { Direction, Message } from '../../libs/enums/common.enum';
 import { NotificationStatus } from '../../libs/enums/notification.enum';
+import { Notifications, Notification } from '../../libs/dto/notification/notification';
+import { T } from '../../libs/types/common';
 
 @Injectable()
 export class NotificationService {
@@ -52,6 +54,35 @@ export class NotificationService {
 			)
 			.exec();
 		if (!result) throw new InternalServerErrorException(Message.UPDATE_FAILED);
+		return result;
+	}
+	public async getUserNotifications(memberId: ObjectId, input: NotificationsInquiry): Promise<Notifications> {
+		const match: T = {
+			receiverId: memberId,
+			notificationStatus: input?.search?.notificationStatus
+				? input.search.notificationStatus
+				: { $in: [NotificationStatus.WAIT, NotificationStatus.READ] },
+		};
+		const sort: T = { [input?.sort ?? 'createdAt']: input?.direction ?? Direction.DESC };
+		const result = await this.notificationModel
+			.aggregate([
+				{ $match: match },
+				{ $sort: sort },
+				{
+					$facet: {
+						list: [{ $skip: (input.page - 1) * input.limit }, { $limit: input.limit }],
+						metaCounter: [{ $count: 'total' }],
+					},
+				},
+			])
+			.exec();
+		if (!result.length) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
+		return result[0];
+	}
+	public async removeNotification(notificationId: ObjectId): Promise<Notification> {
+		const search: T = { _id: notificationId, notificationStatus: NotificationStatus.READ };
+		const result = await this.notificationModel.findOneAndDelete(search).exec();
+		if (!result) throw new InternalServerErrorException(Message.REMOVE_FAILED);
 		return result;
 	}
 }
