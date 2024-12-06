@@ -227,7 +227,7 @@ export class PropertyService {
 			const notification: NotificationInput = {
 				notificationType: NotificationType.LIKE,
 				notificationGroup: NotificationGroup.PROPERTY,
-				notificationTitle: `${liker.memberNick} has liked your product '${property.propertyTitle}'`,
+				notificationTitle: `${liker.memberNick} has liked your property called '${property.propertyTitle}'`,
 				authorId: memberId,
 				receiverId: receiverId,
 				productId: likeRefId,
