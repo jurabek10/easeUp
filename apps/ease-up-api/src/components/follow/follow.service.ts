@@ -35,10 +35,11 @@ export class FollowService {
 		await this.memberService.memberStatsEditor({ _id: followerId, targetKey: 'memberFollowings', modifier: 1 });
 		await this.memberService.memberStatsEditor({ _id: followingId, targetKey: 'memberFollowers', modifier: 1 });
 
+		const follower = await this.memberService.getMember(null, followerId);
 		const notification: NotificationInput = {
 			notificationType: NotificationType.FOLLOW,
 			notificationGroup: NotificationGroup.MEMBER,
-			notificationTitle: 'You have new follower',
+			notificationTitle: `${follower.memberNick}  has followed you`,
 			authorId: followerId,
 			receiverId: followingId,
 			productId: null,

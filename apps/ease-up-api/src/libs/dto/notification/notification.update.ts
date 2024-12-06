@@ -1,7 +1,6 @@
 import { Field, InputType } from '@nestjs/graphql';
 import { IsNotEmpty, IsOptional } from 'class-validator';
 import { ObjectId } from 'mongoose';
-import { CommentStatus } from '../../enums/comment.enum';
 import { NotificationStatus } from '../../enums/notification.enum';
 
 @InputType()
@@ -13,5 +12,4 @@ export class NotificationUpdate {
 	@IsOptional()
 	@Field(() => NotificationStatus, { nullable: true })
 	notificationStatus?: NotificationStatus;
-	memberId: ObjectId;
 }

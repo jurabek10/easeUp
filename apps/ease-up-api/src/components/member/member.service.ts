@@ -160,28 +160,43 @@ export class MemberService {
 		});
 
 		if (!result) throw new InternalServerErrorException(Message.SOMETHING_WENT_WRONG);
-		const notification: NotificationInput = {
-			notificationType: NotificationType.LIKE,
-			notificationGroup: NotificationGroup.MEMBER,
-			notificationTitle: 'Someone has liked you',
-			authorId: memberId,
-			receiverId: likeRefId,
-			productId: null,
-			articleId: null,
-		};
-		if (modifier === 1) {
-			const result = await this.notificationService.createNotification(notification);
-			console.log('result ----->', result);
-		} else {
-			const input = {
+
+		if (memberId.toString() !== likeRefId.toString()) {
+			const liker = await this.getMember(null, memberId);
+			const notification: NotificationInput = {
+				notificationType: NotificationType.LIKE,
+				notificationGroup: NotificationGroup.MEMBER,
+				notificationTitle: `${liker.memberNick} has liked you`,
 				authorId: memberId,
 				receiverId: likeRefId,
 				productId: null,
 				articleId: null,
 			};
-			await this.notificationService.deleteNotification(input);
+			if (modifier === 1) {
+				const result = await this.notificationService.createNotification(notification);
+				console.log('result ----->', result);
+			} else {
+				const input = {
+					authorId: memberId,
+					receiverId: likeRefId,
+					productId: null,
+					articleId: null,
+				};
+				if (modifier === 1) {
+					const result = await this.notificationService.createNotification(notification);
+					console.log('result ----->', result);
+				} else {
+					const input = {
+						authorId: memberId,
+						receiverId: likeRefId,
+						productId: null,
+						articleId: null,
+					};
+					await this.notificationService.deleteNotification(input);
+				}
+			}
+			return result;
 		}
-		return result;
 	}
 
 	public async getAllMemberByAdmin(input: MembersInquiry): Promise<Members> {

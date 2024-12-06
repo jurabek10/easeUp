@@ -37,16 +37,20 @@ export class CommentService {
 		switch (input.commentGroup) {
 			case CommentGroup.PROPERTY:
 				const productReceiverId = await this.propertyService.getMemberId(input.commentRefId);
-				const productNotification: NotificationInput = {
-					notificationType: NotificationType.COMMENT,
-					notificationGroup: NotificationGroup.PROPERTY,
-					notificationTitle: 'Someone commented on your product',
-					authorId: memberId,
-					receiverId: productReceiverId,
-					productId: input.commentRefId,
-					articleId: null,
-				};
-				await this.notificationService.createNotification(productNotification);
+				const property = await this.propertyService.getProperty(null, input.commentRefId);
+				const pCommentWriter = await this.memberService.getMember(null, memberId);
+				if (memberId.toString() !== productReceiverId.toString()) {
+					const productNotification: NotificationInput = {
+						notificationType: NotificationType.COMMENT,
+						notificationGroup: NotificationGroup.PROPERTY,
+						notificationTitle: `${pCommentWriter.memberNick} commented on your product "${property.propertyTitle}"`,
+						authorId: memberId,
+						receiverId: productReceiverId,
+						productId: input.commentRefId,
+						articleId: null,
+					};
+					await this.notificationService.createNotification(productNotification);
+				}
 
 				await this.propertyService.propertyStatsEditor({
 					_id: input.commentRefId,
@@ -56,17 +60,21 @@ export class CommentService {
 				break;
 				break;
 			case CommentGroup.ARTICLE:
-				const aReceiverId = await this.boardArticleService.getMemberId(input.commentRefId);
-				const articleNotification: NotificationInput = {
-					notificationType: NotificationType.COMMENT,
-					notificationGroup: NotificationGroup.ARTICLE,
-					notificationTitle: 'Someone commented on your article',
-					authorId: memberId,
-					receiverId: aReceiverId,
-					productId: null,
-					articleId: input.commentRefId,
-				};
-				await this.notificationService.createNotification(articleNotification);
+				const articleComReciverId = await this.boardArticleService.getMemberId(input.commentRefId);
+				const article = await this.boardArticleService.getBoardArticle(null, input.commentRefId);
+				const aCommentWriter = await this.memberService.getMember(null, memberId);
+				if (memberId.toString() !== articleComReciverId.toString()) {
+					const articleNotification: NotificationInput = {
+						notificationType: NotificationType.COMMENT,
+						notificationGroup: NotificationGroup.ARTICLE,
+						notificationTitle: `${aCommentWriter.memberNick} commented on your artincle "${article.articleTitle}"`,
+						authorId: memberId,
+						receiverId: articleComReciverId,
+						productId: null,
+						articleId: input.commentRefId,
+					};
+					await this.notificationService.createNotification(articleNotification);
+				}
 
 				await this.boardArticleService.boardArticleStatsEditor({
 					_id: input.commentRefId,
@@ -76,16 +84,19 @@ export class CommentService {
 				break;
 				break;
 			case CommentGroup.MEMBER:
-				const memberNotification: NotificationInput = {
-					notificationType: NotificationType.COMMENT,
-					notificationGroup: NotificationGroup.MEMBER,
-					notificationTitle: 'Someone left comment on you',
-					authorId: memberId,
-					receiverId: input.commentRefId,
-					productId: null,
-					articleId: null,
-				};
-				await this.notificationService.createNotification(memberNotification);
+				const CommentWriter = await this.memberService.getMember(null, memberId);
+				if (memberId.toString() !== input.commentRefId.toString()) {
+					const memberNotification: NotificationInput = {
+						notificationType: NotificationType.COMMENT,
+						notificationGroup: NotificationGroup.MEMBER,
+						notificationTitle: `${CommentWriter.memberNick} left comment on you`,
+						authorId: memberId,
+						receiverId: input.commentRefId,
+						productId: null,
+						articleId: null,
+					};
+					await this.notificationService.createNotification(memberNotification);
+				}
 				await this.memberService.memberStatsEditor({
 					_id: input.commentRefId,
 					targetKey: 'memberComments',

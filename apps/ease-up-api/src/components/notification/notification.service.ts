@@ -47,7 +47,6 @@ export class NotificationService {
 				{
 					_id: _id,
 					receiverId: memberId,
-					notificationStatus: NotificationStatus.WAIT,
 				},
 				input,
 				{ new: true },
