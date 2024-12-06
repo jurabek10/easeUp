@@ -18,6 +18,9 @@ import { BoardArticleUpdate } from '../../libs/dto/board-article/board-article.u
 import { LikeService } from '../like/like.service';
 import { LikeInput } from '../../libs/dto/like/like.input';
 import { LikeGroup } from '../../libs/enums/like.enum';
+import { NotificationService } from '../notification/notification.service';
+import { NotificationInput } from '../../libs/dto/notification/notification.input';
+import { NotificationGroup, NotificationType } from '../../libs/enums/notification.enum';
 
 @Injectable()
 export class BoardArticleService {
@@ -26,6 +29,7 @@ export class BoardArticleService {
 		private readonly memberService: MemberService,
 		private readonly viewService: ViewService,
 		private readonly likeService: LikeService,
+		private notificationService: NotificationService,
 	) {}
 
 	public async createBoardArticle(memberId: ObjectId, input: BoardArticleInput): Promise<BoardArticle> {
@@ -135,7 +139,33 @@ export class BoardArticleService {
 			modifier: modifier,
 		});
 		if (!result) throw new InternalServerErrorException(Message.SOMETHING_WENT_WRONG);
+		const receiverId = await this.getMemberId(input.likeRefId);
+		const notification: NotificationInput = {
+			notificationType: NotificationType.LIKE,
+			notificationGroup: NotificationGroup.ARTICLE,
+			notificationTitle: 'Someone liked your article',
+			authorId: memberId,
+			receiverId: receiverId,
+			productId: null,
+			articleId: likeRefId,
+		};
+		if (modifier === 1) {
+			await this.notificationService.createNotification(notification);
+		} else {
+			const input = {
+				authorId: memberId,
+				receiverId: receiverId,
+				articleId: likeRefId,
+			};
+			await this.notificationService.deleteNotification(input);
+		}
 		return result;
+	}
+
+	public async getMemberId(articleId: ObjectId): Promise<ObjectId> {
+		const result = await this.boardArticleModel.findOne({ _id: articleId });
+		if (!result) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
+		return result.memberId;
 	}
 
 	public async getAllBoardArticlesByAdmin(input: AllBoardArticlesInquiry): Promise<BoardArticles> {

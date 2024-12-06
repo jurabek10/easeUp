@@ -10,4 +10,15 @@ import { shapeIntoMogoObjectId } from '../../libs/config';
 @Resolver()
 export class NotificationResolver {
 	constructor(private readonly notificationService: NotificationService) {}
+
+	// @UseGuards(AuthGuard)
+	// @Mutation(() => Notification)
+	// public async updateNotification(
+	// 	@Args('input') input: NotificationUpdate,
+	// 	@AuthMember('_id') memberId: ObjectId,
+	// ): Promise<Notification> {
+	// 	console.log('Mutation: notificationUpdate ');
+	// 	input._id = shapeIntoMogoObjectId(input._id);
+	// 	return await this.notificationService.updateNotification(memberId, input);
+	// }
 }

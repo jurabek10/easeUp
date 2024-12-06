@@ -21,6 +21,9 @@ import { lookupAuthMemberLiked, lookupMember, shapeIntoMogoObjectId } from '../.
 import { LikeInput } from '../../libs/dto/like/like.input';
 import { LikeGroup } from '../../libs/enums/like.enum';
 import { LikeService } from '../like/like.service';
+import { NotificationService } from '../notification/notification.service';
+import { NotificationInput } from '../../libs/dto/notification/notification.input';
+import { NotificationGroup, NotificationType } from '../../libs/enums/notification.enum';
 
 @Injectable()
 export class PropertyService {
@@ -29,6 +32,7 @@ export class PropertyService {
 		private memberService: MemberService,
 		private viewService: ViewService,
 		private likeService: LikeService,
+		private notificationService: NotificationService,
 	) {}
 
 	public async createProperty(input: PropertyInput): Promise<Property> {
@@ -215,7 +219,33 @@ export class PropertyService {
 			modifier: modifier,
 		});
 		if (!result) throw new InternalServerErrorException(Message.SOMETHING_WENT_WRONG);
+		const receiverId = await this.getMemberId(input.likeRefId);
+		const notification: NotificationInput = {
+			notificationType: NotificationType.LIKE,
+			notificationGroup: NotificationGroup.PROPERTY,
+			notificationTitle: 'Someone liked your product',
+			authorId: memberId,
+			receiverId: receiverId,
+			productId: likeRefId,
+			articleId: null,
+		};
+		if (modifier === 1) {
+			await this.notificationService.createNotification(notification);
+		} else {
+			const input = {
+				authorId: memberId,
+				receiverId: receiverId,
+				productId: likeRefId,
+			};
+			await this.notificationService.deleteNotification(input);
+		}
 		return result;
+	}
+
+	public async getMemberId(productId: ObjectId): Promise<ObjectId> {
+		const result = await this.propertyModel.findOne({ _id: productId });
+		if (!result) throw new InternalServerErrorException(Message.BLOCKED_USER);
+		return result.memberId;
 	}
 
 	public async getAllPropertiesByAdmin(input: AllPropertiesInquiry): Promise<Properties> {

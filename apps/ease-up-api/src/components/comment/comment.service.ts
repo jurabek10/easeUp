@@ -11,6 +11,9 @@ import { CommentUpdate } from '../../libs/dto/comment/comment.update';
 import { Comment, Comments } from '../../libs/dto/comment/comment';
 import { T } from '../../libs/types/common';
 import { lookupMember } from '../../libs/config';
+import { NotificationService } from '../notification/notification.service';
+import { NotificationGroup, NotificationType } from '../../libs/enums/notification.enum';
+import { NotificationInput } from '../../libs/dto/notification/notification.input';
 
 @Injectable()
 export class CommentService {
@@ -19,6 +22,7 @@ export class CommentService {
 		private readonly memberService: MemberService,
 		private readonly propertyService: PropertyService,
 		private readonly boardArticleService: BoardArticleService,
+		private readonly notificationService: NotificationService,
 	) {}
 
 	public async createComment(memberId: ObjectId, input: CommentInput): Promise<Comment> {
@@ -32,20 +36,56 @@ export class CommentService {
 		}
 		switch (input.commentGroup) {
 			case CommentGroup.PROPERTY:
+				const productReceiverId = await this.propertyService.getMemberId(input.commentRefId);
+				const productNotification: NotificationInput = {
+					notificationType: NotificationType.COMMENT,
+					notificationGroup: NotificationGroup.PROPERTY,
+					notificationTitle: 'Someone commented on your product',
+					authorId: memberId,
+					receiverId: productReceiverId,
+					productId: input.commentRefId,
+					articleId: null,
+				};
+				await this.notificationService.createNotification(productNotification);
+
 				await this.propertyService.propertyStatsEditor({
 					_id: input.commentRefId,
-					targetKey: 'propertyComments',
+					targetKey: 'productComments',
 					modifier: 1,
 				});
 				break;
+				break;
 			case CommentGroup.ARTICLE:
+				const aReceiverId = await this.boardArticleService.getMemberId(input.commentRefId);
+				const articleNotification: NotificationInput = {
+					notificationType: NotificationType.COMMENT,
+					notificationGroup: NotificationGroup.ARTICLE,
+					notificationTitle: 'Someone commented on your article',
+					authorId: memberId,
+					receiverId: aReceiverId,
+					productId: null,
+					articleId: input.commentRefId,
+				};
+				await this.notificationService.createNotification(articleNotification);
+
 				await this.boardArticleService.boardArticleStatsEditor({
 					_id: input.commentRefId,
 					targetKey: 'articleComments',
 					modifier: 1,
 				});
 				break;
+				break;
 			case CommentGroup.MEMBER:
+				const memberNotification: NotificationInput = {
+					notificationType: NotificationType.COMMENT,
+					notificationGroup: NotificationGroup.MEMBER,
+					notificationTitle: 'Someone left comment on you',
+					authorId: memberId,
+					receiverId: input.commentRefId,
+					productId: null,
+					articleId: null,
+				};
+				await this.notificationService.createNotification(memberNotification);
 				await this.memberService.memberStatsEditor({
 					_id: input.commentRefId,
 					targetKey: 'memberComments',
