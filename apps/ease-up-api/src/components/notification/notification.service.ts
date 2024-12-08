@@ -55,12 +55,11 @@ export class NotificationService {
 		if (!result) throw new InternalServerErrorException(Message.UPDATE_FAILED);
 		return result;
 	}
+
 	public async getUserNotifications(memberId: ObjectId, input: NotificationsInquiry): Promise<Notifications> {
 		const match: T = {
 			receiverId: memberId,
-			notificationStatus: input?.search?.notificationStatus
-				? input.search.notificationStatus
-				: { $in: [NotificationStatus.WAIT, NotificationStatus.READ] },
+			notificationStatus: NotificationStatus.WAIT,
 		};
 		const sort: T = { [input?.sort ?? 'createdAt']: input?.direction ?? Direction.DESC };
 		const result = await this.notificationModel
@@ -78,10 +77,25 @@ export class NotificationService {
 		if (!result.length) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
 		return result[0];
 	}
+
 	public async removeNotification(notificationId: ObjectId): Promise<Notification> {
-		const search: T = { _id: notificationId, notificationStatus: NotificationStatus.READ };
+		const search: T = { _id: notificationId };
 		const result = await this.notificationModel.findOneAndDelete(search).exec();
 		if (!result) throw new InternalServerErrorException(Message.REMOVE_FAILED);
 		return result;
+	}
+
+	public async markAllNotificationsAsRead(memberId: ObjectId): Promise<number> {
+		try {
+			const result = await this.notificationModel.updateMany(
+				{ receiverId: memberId, notificationStatus: { $ne: 'READ' } },
+				{ $set: { notificationStatus: 'READ' } },
+			);
+
+			return result.modifiedCount; // Use modifiedCount instead of nModified
+		} catch (error) {
+			console.error('Error updating notifications status:', error);
+			throw new InternalServerErrorException('Failed to mark notifications as read');
+		}
 	}
 }

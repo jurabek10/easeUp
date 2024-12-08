@@ -42,4 +42,12 @@ export class NotificationResolver {
 		const productId = shapeIntoMogoObjectId(input);
 		return await this.notificationService.removeNotification(productId);
 	}
+
+	@UseGuards(AuthGuard)
+	@Mutation(() => Boolean)
+	public async markAllNotificationsAsRead(@AuthMember('_id') memberId: ObjectId): Promise<boolean> {
+		console.log('Mutation: Mark all notifications as READ');
+		const updatedCount = await this.notificationService.markAllNotificationsAsRead(memberId);
+		return updatedCount > 0; // Return true if any notifications were marked as READ
+	}
 }
