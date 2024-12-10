@@ -16,12 +16,10 @@ export class PropertyInput {
 	propertyLocation: PropertyLocation;
 
 	@IsNotEmpty()
-	@Length(3, 100)
 	@Field(() => String)
 	propertyAddress: string;
 
 	@IsNotEmpty()
-	@Length(3, 100)
 	@Field(() => String)
 	propertyTitle: string;
 
@@ -56,7 +54,6 @@ export class PropertyInput {
 	propertyImages: string[];
 
 	@IsOptional()
-	@Length(5, 500)
 	@Field(() => String, { nullable: true })
 	propertyDesc?: string;
 
