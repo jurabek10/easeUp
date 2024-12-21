@@ -1,5 +1,3 @@
-version: '3.3'
-
 services:
   easeUp-api:
     container_name: easeUp-api
