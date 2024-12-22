@@ -2,6 +2,7 @@ import { Mutation, Resolver, Query, Args } from '@nestjs/graphql';
 import { MemberService } from './member.service';
 import { InternalServerErrorException, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { AgentsInquiry, LoginInput, MemberInput, MembersInquiry } from '../../libs/dto/member/member.input';
+import { GraphQLUpload, FileUpload } from 'graphql-upload';
 import { Member, Members } from '../../libs/dto/member/member';
 
 import { AuthMember } from '../auth/decorators/authMember.decorator';
@@ -13,7 +14,6 @@ import { AuthGuard } from '../auth/guards/auth.guard';
 import { MemberUpdate } from '../../libs/dto/member/member.update';
 import { WithoutGuard } from '../auth/guards/without.guard';
 import { getSerialForImage, shapeIntoMogoObjectId, validMimeTypes } from '../../libs/config';
-import { GraphQLUpload, FileUpload } from 'graphql-upload';
 import { Message } from '../../libs/enums/common.enum';
 import { createWriteStream } from 'fs';
 
