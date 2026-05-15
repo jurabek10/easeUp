@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: easeup-api
+    runtime: node
+    plan: free
+    region: oregon
+    buildCommand: npm ci && npm run build
+    startCommand: npm run start:prod
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGO_PROD
+        sync: false
+      - key: SECRET_TOKEN
+        generateValue: true
