@@ -15,7 +15,7 @@ import { MemberUpdate } from '../../libs/dto/member/member.update';
 import { WithoutGuard } from '../auth/guards/without.guard';
 import { getSerialForImage, shapeIntoMogoObjectId, validMimeTypes } from '../../libs/config';
 import { Message } from '../../libs/enums/common.enum';
-import { createWriteStream } from 'fs';
+import { storeImageUpload } from '../../libs/utils/upload';
 
 @Resolver()
 export class MemberResolver {
@@ -136,18 +136,9 @@ export class MemberResolver {
 		if (!validMime) throw new Error(Message.PROVIDE_ALLOWED_FORMAT);
 
 		const imageName = getSerialForImage(filename);
-		const url = `uploads/${target}/${imageName}`;
 		const stream = createReadStream();
 
-		const result = await new Promise((resolve, reject) => {
-			stream
-				.pipe(createWriteStream(url))
-				.on('finish', async () => resolve(true))
-				.on('error', () => reject(false));
-		});
-		if (!result) throw new Error(Message.UPLOAD_FAILED);
-
-		return url;
+		return await storeImageUpload(stream, target.toString(), imageName);
 	}
 
 	@UseGuards(AuthGuard)
@@ -168,18 +159,9 @@ export class MemberResolver {
 				if (!validMime) throw new Error(Message.PROVIDE_ALLOWED_FORMAT);
 
 				const imageName = getSerialForImage(filename);
-				const url = `uploads/${target}/${imageName}`;
 				const stream = createReadStream();
 
-				const result = await new Promise((resolve, reject) => {
-					stream
-						.pipe(createWriteStream(url))
-						.on('finish', () => resolve(true))
-						.on('error', () => reject(false));
-				});
-				if (!result) throw new Error(Message.UPLOAD_FAILED);
-
-				uploadedImages[index] = url;
+				uploadedImages[index] = await storeImageUpload(stream, target.toString(), imageName);
 			} catch (err) {
 				console.log('Error, file missing!');
 			}
